@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/guideline2"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.85"/>
+        app:layout_constraintGuide_percent="0.73"/>
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -22,24 +22,24 @@
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/batteryValue"/>
+        />
 
     <TextView
         android:id="@+id/batteryValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="7dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Battery: NaN"
+        android:text="Baterka: NaN"
+        app:layout_constraintBottom_toTopOf="@+id/progressBar"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline2"/>
+        app:layout_constraintHorizontal_bias="0.503"/>
 
     <android.support.constraint.Guideline
         android:layout_width="wrap_content"
@@ -54,7 +54,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
-        android:text="Temperature:"
+        android:text="Teplota:"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
@@ -66,6 +66,7 @@
         android:layout_marginLeft="8dp"
         android:text="NaN"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textStyle="bold"
         app:layout_constraintBaseline_toBaselineOf="@+id/textView2"
         app:layout_constraintLeft_toLeftOf="@+id/guideline3"/>
 
@@ -75,7 +76,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
-        android:text="Humidity:"
+        android:text="Vlhkosť:"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2"/>
@@ -87,6 +88,7 @@
         android:layout_marginLeft="8dp"
         android:text="NaN"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textStyle="bold"
         app:layout_constraintBaseline_toBaselineOf="@+id/textView4"
         app:layout_constraintLeft_toLeftOf="@+id/guideline3"/>
 
@@ -96,7 +98,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
-        android:text="Dew point:"
+        android:text="Rosný bod:"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView4"/>
@@ -108,6 +110,7 @@
         android:layout_marginLeft="8dp"
         android:text="NaN"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textStyle="bold"
         app:layout_constraintBaseline_toBaselineOf="@+id/textView6"
         app:layout_constraintLeft_toLeftOf="@+id/guideline3"/>
 
@@ -117,7 +120,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
-        android:text="Pressure:"
+        android:text="Tlak:"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView6"/>
@@ -129,6 +132,7 @@
         android:layout_marginLeft="8dp"
         android:text="NaN"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textStyle="bold"
         app:layout_constraintBaseline_toBaselineOf="@+id/textView8"
         app:layout_constraintLeft_toLeftOf="@+id/guideline3"/>
 
@@ -138,7 +142,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
-        android:text="Elevation:"
+        android:text="Nadm. výška:"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView8"/>
@@ -150,6 +154,7 @@
         android:layout_marginLeft="8dp"
         android:text="NaN"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textStyle="bold"
         app:layout_constraintBaseline_toBaselineOf="@+id/textView10"
         app:layout_constraintLeft_toLeftOf="@+id/guideline3"/>
 
@@ -160,7 +165,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:text="Last update:"
+        android:text="Posledná aktualizácia:"
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         app:layout_constraintBottom_toTopOf="@+id/lastpacket"
         app:layout_constraintHorizontal_bias="0.501"
@@ -172,11 +177,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
-        android:text="Last packet:"
-        app:layout_constraintBottom_toTopOf="@+id/guideline2"
         android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginRight="8dp"
+        android:text="Posledné dáta:"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toTopOf="@+id/guideline2"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
 
     <TextView
@@ -197,7 +204,41 @@
         android:layout_marginLeft="8dp"
         android:text="NaN"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textStyle="bold"
         app:layout_constraintBaseline_toBaselineOf="@+id/textView"
         app:layout_constraintLeft_toLeftOf="@+id/guideline3"/>
+
+    <android.support.constraint.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/guideline"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5"/>
+
+    <TextView
+        android:id="@+id/packetcount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:text="Počítadlo: NaN"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toTopOf="@+id/batteryValue"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+    <TextView
+        android:id="@+id/id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:text="ID: NaN"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toTopOf="@+id/packetcount"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>

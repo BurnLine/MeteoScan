@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView lastUpdate;
     private TextView lastPacket;
     private TextView rssi;
+    private TextView packetCount;
+    private TextView id;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
 
@@ -90,6 +92,11 @@ public class MainActivity extends AppCompatActivity {
         lastUpdate = (TextView)findViewById(R.id.update);
         lastPacket = (TextView)findViewById(R.id.lastpacket);
         rssi = (TextView)findViewById(R.id.rssi);
+        packetCount = (TextView)findViewById(R.id.packetcount);
+        id = (TextView)findViewById(R.id.id);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_small);
 
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, "BLE Not Supported", Toast.LENGTH_SHORT).show();
@@ -151,18 +158,19 @@ public class MainActivity extends AppCompatActivity {
         ByteBuffer buffer = ByteBuffer.wrap(data);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
 
-        rssi.setText(String.format(Locale.ENGLISH, "%d", scanResult.getRssi()));
 
         double temp;
         double humidity;
         double devPoint;
         double pressure;
         short elevation;
+        short packets;
         byte battery;
+        byte[] idecko = new byte[5];
 
         int id = buffer.getInt();
 
-        lastPacket.setText("Last packet: " + formattedDate);
+        lastPacket.setText("Posledné dáta: " + formattedDate);
 
         if (id != 0x03001903) {
             bluetoothAdapter.getBluetoothLeScanner().flushPendingScanResults(scanCallback);
@@ -176,19 +184,28 @@ public class MainActivity extends AppCompatActivity {
         pressure = buffer.getInt() / 10.0;
         elevation = buffer.getShort();
         battery = buffer.get();
+        packets = buffer.getShort();
+
+        idecko[0] = buffer.get();
+        idecko[1] = buffer.get();
+        idecko[2] = buffer.get();
+        idecko[3] = buffer.get();
+        idecko[4] = buffer.get();
 
         Log.i("BT", String.format("T=%f Hum=%f DevP=%f Pres=%f Elev=%d Bat=%d%%", temp, humidity, devPoint, pressure, elevation, battery));
 
         progressBar.setProgress(battery);
-        batteryValue.setText(String.format(Locale.ENGLISH, "Battery: %d%%", battery));
+        batteryValue.setText(String.format(Locale.ENGLISH, "Baterka: %d%%", battery));
 
-        temperature.setText(String.format(Locale.ENGLISH, "%.1f", temp));
-        this.humidity.setText(String.format(Locale.ENGLISH, "%.1f", humidity));
-        dewPoint.setText(String.format(Locale.ENGLISH, "%.1f", devPoint));
-        this.pressure.setText(String.format(Locale.ENGLISH, "%.1f", pressure));
-        this.elevation.setText(String.format(Locale.ENGLISH, "%d", elevation));
-
-        lastUpdate.setText("Last update: " + formattedDate);
+        temperature.setText(String.format(Locale.ENGLISH, "%.1f °C", temp));
+        this.humidity.setText(String.format(Locale.ENGLISH, "%.1f %%", humidity));
+        dewPoint.setText(String.format(Locale.ENGLISH, "%.1f °C", devPoint));
+        this.pressure.setText(String.format(Locale.ENGLISH, "%.1f hPa", pressure));
+        this.elevation.setText(String.format(Locale.ENGLISH, "%d m", elevation));
+        rssi.setText(String.format(Locale.ENGLISH, "%d dBm", scanResult.getRssi()));
+        packetCount.setText(String.format(Locale.ENGLISH, "Počítadlo: %d", packets));
+        this.id.setText(String.format(Locale.ENGLISH, "ID: 0x%s", bytesToHex(idecko)));
+        lastUpdate.setText("Posledná aktualizácia: " + formattedDate);
     }
 
     private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
