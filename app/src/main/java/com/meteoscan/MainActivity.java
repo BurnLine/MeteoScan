@@ -13,6 +13,7 @@ import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -36,6 +37,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 123;
+    private static final int REQUEST_ENABLE_BT = 356;
 
     private BluetoothAdapter bluetoothAdapter;
     private ProgressBar progressBar;
@@ -48,8 +50,29 @@ public class MainActivity extends AppCompatActivity {
     private TextView elevation;
     private TextView lastUpdate;
     private TextView lastPacket;
+    private TextView rssi;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+
+    private ScanCallback scanCallback = new ScanCallback() {
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+            super.onScanResult(callbackType, result);
+            parseData(result);
+        }
+
+        @Override
+        public void onBatchScanResults(List<ScanResult> results) {
+            super.onBatchScanResults(results);
+            Log.e("BT", "LIST " + results);
+        }
+
+        @Override
+        public void onScanFailed(int errorCode) {
+            super.onScanFailed(errorCode);
+            Log.e("BT", "Error: " + errorCode);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
         elevation = (TextView)findViewById(R.id.elevation);
         lastUpdate = (TextView)findViewById(R.id.update);
         lastPacket = (TextView)findViewById(R.id.lastpacket);
+        rssi = (TextView)findViewById(R.id.rssi);
 
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, "BLE Not Supported", Toast.LENGTH_SHORT).show();
@@ -75,8 +99,23 @@ public class MainActivity extends AppCompatActivity {
 
         final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
-        if (!fuckMarshMallow()) {
-            startScan();
+
+        if (!bluetoothAdapter.isEnabled()) {
+            //bluetoothAdapter.enable();
+            Intent intentBtEnabled = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(intentBtEnabled, REQUEST_ENABLE_BT);
+        } else {
+            if (!fuckMarshMallow()) {
+                startScan();
+            }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (bluetoothAdapter.isEnabled()) {
+            bluetoothAdapter.getBluetoothLeScanner().stopScan(scanCallback);
         }
     }
 
@@ -92,15 +131,8 @@ public class MainActivity extends AppCompatActivity {
                 .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build();
         filters.add(filter);
         BluetoothLeScanner leScanner = bluetoothAdapter.getBluetoothLeScanner();
-        leScanner.startScan(filters, settings, new ScanCallback() {
-            @Override
-            public void onScanResult(int callbackType, ScanResult result) {
-                super.onScanResult(callbackType, result);
-                Log.e("BT", "callback type: " + callbackType + " result: " + result.toString());
-
-                parseData(result);
-            }
-        });
+        leScanner.flushPendingScanResults(scanCallback);
+        leScanner.startScan(filters, settings, scanCallback);
         Toast.makeText(this, "Scan started!", Toast.LENGTH_SHORT).show();
     }
 
@@ -119,6 +151,8 @@ public class MainActivity extends AppCompatActivity {
         ByteBuffer buffer = ByteBuffer.wrap(data);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
 
+        rssi.setText(String.format(Locale.ENGLISH, "%d", scanResult.getRssi()));
+
         double temp;
         double humidity;
         double devPoint;
@@ -131,13 +165,7 @@ public class MainActivity extends AppCompatActivity {
         lastPacket.setText("Last packet: " + formattedDate);
 
         if (id != 0x03001903) {
-            bluetoothAdapter.getBluetoothLeScanner().flushPendingScanResults(new ScanCallback() {
-                @Override
-                public void onScanResult(int callbackType, ScanResult result) {
-                    super.onScanResult(callbackType, result);
-                    Log.i("BTT", result.toString());
-                }
-            });
+            bluetoothAdapter.getBluetoothLeScanner().flushPendingScanResults(scanCallback);
             return;
         }
 
@@ -172,6 +200,26 @@ public class MainActivity extends AppCompatActivity {
             hexChars[j * 2 + 1] = hexArray[v & 0x0F];
         }
         return new String(hexChars);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_ENABLE_BT:
+                if (resultCode == 0) {
+                    Toast.makeText(MainActivity.this, "Bluetooth was not enabled!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (!fuckMarshMallow()) {
+                    startScan();
+                }
+                break;
+            default:
+                System.out.print(requestCode + " " + resultCode + " " + data.toString());
+                return;
+        }
     }
 
     @Override
