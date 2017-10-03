@@ -95,8 +95,13 @@ public class MainActivity extends AppCompatActivity {
         packetCount = (TextView)findViewById(R.id.packetcount);
         id = (TextView)findViewById(R.id.id);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_small);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_small);
+        } else if (getActionBar() != null) {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+            getActionBar().setHomeAsUpIndicator(R.drawable.icon_small);
+        }
 
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, "BLE Not Supported", Toast.LENGTH_SHORT).show();
@@ -106,6 +111,11 @@ public class MainActivity extends AppCompatActivity {
 
         final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
 
         if (!bluetoothAdapter.isEnabled()) {
             //bluetoothAdapter.enable();
@@ -124,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
         if (bluetoothAdapter.isEnabled()) {
             bluetoothAdapter.getBluetoothLeScanner().stopScan(scanCallback);
         }
+        Toast.makeText(this, "Scan stopped!", Toast.LENGTH_SHORT).show();
     }
 
     public void startScan() {
@@ -235,7 +246,6 @@ public class MainActivity extends AppCompatActivity {
                 break;
             default:
                 System.out.print(requestCode + " " + resultCode + " " + data.toString());
-                return;
         }
     }
 
@@ -271,7 +281,15 @@ public class MainActivity extends AppCompatActivity {
                     finish();
                 }
 
-                startScan();
+                if (!bluetoothAdapter.isEnabled()) {
+                    //bluetoothAdapter.enable();
+                    Intent intentBtEnabled = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(intentBtEnabled, REQUEST_ENABLE_BT);
+                } else {
+                    if (!fuckMarshMallow()) {
+                        startScan();
+                    }
+                }
             }
             break;
             default:
@@ -310,7 +328,6 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
-        Toast.makeText(MainActivity.this, "No new Permission Required - Launching App", Toast.LENGTH_SHORT).show();
         return false;
     }
 
